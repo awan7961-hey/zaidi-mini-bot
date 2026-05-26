@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZAIDI-MD — WhatsApp Pairing</title>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #0a0a0a 0%, #111827 50%, #0f172a 100%);
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        color: #f1f5f9;
+        padding: 20px;
+      }
+
+      .card {
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 24px;
+        padding: 48px 40px;
+        width: 100%;
+        max-width: 460px;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+        backdrop-filter: blur(20px);
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+
+      .logo-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #25D366, #128C7E);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+      }
+
+      .logo-text {
+        font-size: 26px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #25D366, #7dd3fc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -0.5px;
+      }
+
+      .subtitle {
+        text-align: center;
+        color: #94a3b8;
+        font-size: 14px;
+        margin-bottom: 36px;
+        line-height: 1.5;
+      }
+
+      .badge {
+        display: inline-block;
+        background: rgba(37,211,102,0.12);
+        border: 1px solid rgba(37,211,102,0.25);
+        color: #25D366;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 20px;
+        margin-bottom: 6px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+      }
+
+      .section-title {
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+      }
+
+      .input-group {
+        position: relative;
+        margin-bottom: 16px;
+      }
+
+      .input-group .flag {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 20px;
+        pointer-events: none;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 14px;
+        padding: 16px 16px 16px 52px;
+        font-size: 16px;
+        color: #f1f5f9;
+        outline: none;
+        transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      }
+
+      input[type="text"]::placeholder { color: #475569; }
+
+      input[type="text"]:focus {
+        border-color: rgba(37,211,102,0.5);
+        background: rgba(255,255,255,0.08);
+        box-shadow: 0 0 0 3px rgba(37,211,102,0.1);
+      }
+
+      .hint {
+        font-size: 12px;
+        color: #475569;
+        margin-top: -8px;
+        margin-bottom: 20px;
+        padding-left: 4px;
+      }
+
+      .btn {
+        width: 100%;
+        background: linear-gradient(135deg, #25D366, #128C7E);
+        border: none;
+        border-radius: 14px;
+        padding: 16px;
+        font-size: 16px;
+        font-weight: 700;
+        color: #fff;
+        cursor: pointer;
+        transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
+        letter-spacing: 0.3px;
+        box-shadow: 0 4px 20px rgba(37,211,102,0.3);
+      }
+
+      .btn:hover:not(:disabled) {
+        opacity: 0.92;
+        box-shadow: 0 6px 28px rgba(37,211,102,0.45);
+      }
+
+      .btn:active:not(:disabled) { transform: scale(0.98); }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .loader {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin: 20px 0;
+        color: #94a3b8;
+        font-size: 14px;
+      }
+
+      .loader.show { display: flex; }
+
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255,255,255,0.15);
+        border-top-color: #25D366;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+      }
+
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      .code-box {
+        display: none;
+        background: linear-gradient(135deg, rgba(37,211,102,0.08), rgba(18,140,126,0.08));
+        border: 1px solid rgba(37,211,102,0.3);
+        border-radius: 16px;
+        padding: 24px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .code-box.show { display: block; }
+
+      .code-box .code-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #25D366;
+        font-weight: 600;
+        margin-bottom: 12px;
+      }
+
+      .code-display {
+        font-size: 36px;
+        font-weight: 900;
+        letter-spacing: 6px;
+        color: #f1f5f9;
+        font-family: 'Courier New', monospace;
+        text-shadow: 0 0 20px rgba(37,211,102,0.4);
+        cursor: pointer;
+        user-select: all;
+        transition: color 0.2s;
+      }
+
+      .code-display:hover { color: #25D366; }
+
+      .copy-hint {
+        font-size: 11px;
+        color: #475569;
+        margin-top: 8px;
+      }
+
+      .code-timer {
+        font-size: 13px;
+        color: #64748b;
+        margin-top: 10px;
+      }
+
+      .steps {
+        margin-top: 24px;
+        padding: 20px;
+        background: rgba(255,255,255,0.03);
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,0.06);
+      }
+
+      .steps-title {
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 14px;
+      }
+
+      .step {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 10px;
+        font-size: 13px;
+        color: #94a3b8;
+        line-height: 1.5;
+      }
+
+      .step:last-child { margin-bottom: 0; }
+
+      .step-num {
+        min-width: 22px;
+        height: 22px;
+        background: rgba(37,211,102,0.15);
+        border: 1px solid rgba(37,211,102,0.25);
+        color: #25D366;
+        border-radius: 50%;
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 1px;
+      }
+
+      .alert {
+        display: none;
+        padding: 12px 16px;
+        border-radius: 12px;
+        font-size: 13px;
+        margin-bottom: 16px;
+        line-height: 1.5;
+      }
+
+      .alert.show { display: block; }
+      .alert.error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); color: #fca5a5; }
+      .alert.success { background: rgba(37,211,102,0.1); border: 1px solid rgba(37,211,102,0.25); color: #86efac; }
+      .alert.info { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25); color: #a5b4fc; }
+
+      .connected-box {
+        display: none;
+        text-align: center;
+        padding: 24px;
+        background: rgba(37,211,102,0.08);
+        border: 1px solid rgba(37,211,102,0.25);
+        border-radius: 16px;
+        margin-top: 20px;
+      }
+
+      .connected-box.show { display: block; }
+      .connected-box .tick { font-size: 40px; margin-bottom: 8px; }
+      .connected-box h3 { color: #25D366; font-size: 18px; margin-bottom: 6px; }
+      .connected-box p { color: #94a3b8; font-size: 13px; }
+
+      .divider {
+        height: 1px;
+        background: rgba(255,255,255,0.06);
+        margin: 28px 0;
+      }
+
+      .footer {
+        text-align: center;
+        color: #334155;
+        font-size: 12px;
+        margin-top: 28px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <!-- Header -->
+      <div class="logo">
+        <div class="logo-icon">💬</div>
+        <span class="logo-text">ZAIDI-MD</span>
+      </div>
+      <div style="text-align:center; margin-bottom:4px;">
+        <span class="badge">Web Pairing</span>
+      </div>
+      <p class="subtitle">Connect your WhatsApp number to the bot using a pairing code — no QR scan needed.</p>
+
+      <!-- Alert Box -->
+      <div class="alert" id="alert"></div>
+
+      <!-- Input Form -->
+      <div id="formSection">
+        <div class="section-title">Your WhatsApp Number</div>
+        <div class="input-group">
+          <span class="flag">📱</span>
+          <input type="text" id="phoneInput" placeholder="923001234567" maxlength="15" inputmode="numeric" />
+        </div>
+        <p class="hint">Include country code, no + or spaces. Example: 923001234567</p>
+        <button class="btn" id="pairBtn" onclick="requestPairCode()">Generate Pairing Code</button>
+      </div>
+
+      <!-- Loader -->
+      <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <span>Requesting pairing code from WhatsApp...</span>
+      </div>
+
+      <!-- Code Display -->
+      <div class="code-box" id="codeBox">
+        <div class="code-label">✦ Your Pairing Code ✦</div>
+        <div class="code-display" id="codeDisplay" onclick="copyCode()" title="Click to copy"></div>
+        <div class="copy-hint">Tap the code to copy it</div>
+        <div class="code-timer" id="timer"></div>
+      </div>
+
+      <!-- Connected State -->
+      <div class="connected-box" id="connectedBox">
+        <div class="tick">✅</div>
+        <h3>Bot Connected!</h3>
+        <p>Your WhatsApp is now linked. The bot is running.</p>
+      </div>
+
+      <!-- Instructions -->
+      <div class="divider"></div>
+      <div class="steps">
+        <div class="steps-title">How to link</div>
+        <div class="step"><div class="step-num">1</div><span>Enter your WhatsApp number above and tap <strong>Generate Pairing Code</strong>.</span></div>
+        <div class="step"><div class="step-num">2</div><span>Open WhatsApp on your phone → <strong>Settings</strong>.</span></div>
+        <div class="step"><div class="step-num">3</div><span>Tap <strong>Linked Devices</strong> → <strong>Link a Device</strong>.</span></div>
+        <div class="step"><div class="step-num">4</div><span>Tap <strong>"Link with phone number instead"</strong>.</span></div>
+        <div class="step"><div class="step-num">5</div><span>Enter the 8-character pairing code shown above.</span></div>
+        <div class="step"><div class="step-num">6</div><span>Done! The bot will connect and send a startup message.</span></div>
+      </div>
+
+      <div class="footer">ZAIDI-MD Bot &nbsp;•&nbsp; Powered by Baileys</div>
+    </div>
+
+    <script>
+      let countdown = null;
+      let pollingInterval = null;
+
+      // Auto-format phone number input
+      document.getElementById('phoneInput').addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
+      });
+
+      function showAlert(msg, type) {
+        const el = document.getElementById('alert');
+        el.textContent = msg;
+        el.className = 'alert show ' + type;
+      }
+
+      function hideAlert() {
+        document.getElementById('alert').className = 'alert';
+      }
+
+      function setLoading(loading) {
+        document.getElementById('loader').className = 'loader' + (loading ? ' show' : '');
+        document.getElementById('pairBtn').disabled = loading;
+      }
+
+      async function requestPairCode() {
+        const number = document.getElementById('phoneInput').value.trim();
+
+        if (!number || number.length < 7) {
+          showAlert('Please enter a valid phone number with country code.', 'error');
+          return;
+        }
+
+        hideAlert();
+        setLoading(true);
+        document.getElementById('codeBox').className = 'code-box';
+
+        try {
+          const res = await fetch('/getpaircode?number=' + encodeURIComponent(number));
+          const data = await res.json();
+
+          if (data.error) {
+            showAlert(data.error, 'error');
+          } else if (data.code) {
+            showAlert('Code generated! Enter it in WhatsApp → Linked Devices → Link with phone number.', 'success');
+            document.getElementById('codeDisplay').textContent = data.code;
+            document.getElementById('codeBox').className = 'code-box show';
+            startCountdown(120);
+            startPolling();
+          }
+        } catch (err) {
+          showAlert('Connection error. Please check your server and try again.', 'error');
+        }
+
+        setLoading(false);
+      }
+
+      function copyCode() {
+        const code = document.getElementById('codeDisplay').textContent;
+        if (!code) return;
+        navigator.clipboard.writeText(code.replace(/-/g, '')).then(() => {
+          showAlert('Code copied to clipboard!', 'info');
+          setTimeout(hideAlert, 2000);
+        }).catch(() => {
+          // Fallback
+          const el = document.getElementById('codeDisplay');
+          const range = document.createRange();
+          range.selectNode(el);
+          window.getSelection().removeAllRanges();
+          window.getSelection().addRange(range);
+        });
+      }
+
+      function startCountdown(seconds) {
+        if (countdown) clearInterval(countdown);
+        const timerEl = document.getElementById('timer');
+        let remaining = seconds;
+        countdown = setInterval(() => {
+          remaining--;
+          if (remaining <= 0) {
+            clearInterval(countdown);
+            timerEl.textContent = 'Code expired. Generate a new one.';
+            timerEl.style.color = '#ef4444';
+          } else {
+            const m = Math.floor(remaining / 60);
+            const s = remaining % 60;
+            timerEl.textContent = 'Code expires in ' + m + ':' + String(s).padStart(2, '0');
+            timerEl.style.color = remaining < 30 ? '#f59e0b' : '#64748b';
+          }
+        }, 1000);
+      }
+
+      function startPolling() {
+        if (pollingInterval) clearInterval(pollingInterval);
+        pollingInterval = setInterval(async () => {
+          try {
+            const res = await fetch('/status');
+            const data = await res.json();
+            if (data.connected) {
+              clearInterval(pollingInterval);
+              if (countdown) clearInterval(countdown);
+              document.getElementById('codeBox').className = 'code-box';
+              document.getElementById('formSection').style.display = 'none';
+              document.getElementById('connectedBox').className = 'connected-box show';
+              showAlert('WhatsApp connected successfully!', 'success');
+            }
+          } catch (e) {}
+        }, 3000);
+      }
+
+      // Check initial status
+      (async () => {
+        try {
+          const res = await fetch('/status');
+          const data = await res.json();
+          if (data.connected) {
+            document.getElementById('formSection').style.display = 'none';
+            document.getElementById('connectedBox').className = 'connected-box show';
+            showAlert('Bot is already connected to WhatsApp.', 'success');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </body>
+  </html>
