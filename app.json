@@ -1,18 +1,12 @@
 {
   "name": "𓆩ZAIDI-MD𓆪",
-  "description": "Javascript WhatsApp bot made by 𝙰𝙽𝙰𝚈𝙰𝚃-𝙷𝙰𝙲𝙺𝙴𝚁",
+  "description": "Javascript WhatsApp bot made by zaidi-𝙷𝙰𝙲𝙺𝙴𝚁",
   "logo": "https://files.catbox.moe/ba1k10.jpg",
   "keywords": ["𓆩ZAIDI-MD𓆪"],
   "success_url": "/",
 
     "stack": "container",
   "env": {
-    "SESSION_ID": {
-      "description": "Put the session-id here.",
-      "required": true,
-      "value": ""
-    },  
-    
     "STICKER_NAME": {
       "description": "type your sticker pack name.",
       "required": false,
