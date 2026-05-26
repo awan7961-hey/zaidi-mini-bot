@@ -1,0 +1,109 @@
+{
+  "name": "ZAIDI-MD",
+  "description": "WhatsApp Bot — connect via the web pairing page (no SESSION_ID needed).",
+  "logo": "https://files.catbox.moe/ba1k10.jpg",
+  "keywords": ["ZAIDI-MD", "whatsapp", "bot"],
+  "success_url": "/",
+  "stack": "container",
+  "env": {
+    "STICKER_NAME": {
+      "description": "Sticker pack name.",
+      "required": false,
+      "value": "ZAIDI-MD~"
+    },
+    "PREFIX": {
+      "description": "Bot command prefix.",
+      "required": false,
+      "value": "."
+    },
+    "MODE": {
+      "description": "Bot work mode: public / private / inbox / group.",
+      "required": false,
+      "value": "public"
+    },
+    "ANTI_DELETE": {
+      "description": "Show deleted messages (true/false).",
+      "required": false,
+      "value": "true"
+    },
+    "ALWAYS_ONLINE": {
+      "description": "Keep bot always online (true/false).",
+      "required": false,
+      "value": "true"
+    },
+    "AUTO_REPLY": {
+      "description": "Enable auto reply (true/false).",
+      "required": false,
+      "value": "false"
+    },
+    "AUTO_STICKER": {
+      "description": "Enable auto sticker (true/false).",
+      "required": false,
+      "value": "false"
+    },
+    "AUTO_STATUS_SEEN": {
+      "description": "Auto-view statuses (true/false).",
+      "required": false,
+      "value": "true"
+    },
+    "AUTO_STATUS_REACT": {
+      "description": "Auto-react to statuses (true/false).",
+      "required": false,
+      "value": "true"
+    },
+    "AUTO_STATUS_REPLY": {
+      "description": "Auto-reply on status view (true/false).",
+      "required": false,
+      "value": "false"
+    },
+    "AUTO_STATUS_MSG": {
+      "description": "Message sent when auto-replying to status.",
+      "required": false,
+      "value": "*SEEN YOUR STATUS BY ZAIDI-MD 🖤*"
+    },
+    "OWNER_NAME": {
+      "description": "Bot owner name.",
+      "required": false,
+      "value": "ZAIDI-MD"
+    },
+    "OWNER_NUMBER": {
+      "description": "Owner WhatsApp number (with country code, no +).",
+      "required": true,
+      "value": "923315462969"
+    },
+    "BOT_NAME": {
+      "description": "Bot display name.",
+      "required": false,
+      "value": "ZAIDI-MD"
+    },
+    "ANTI_LINK": {
+      "description": "Remove group links (true/false).",
+      "required": false,
+      "value": "true"
+    },
+    "ANTI_LINK_KICK": {
+      "description": "Kick member on link send (true/false).",
+      "required": false,
+      "value": "true"
+    },
+    "ANTI_BAD": {
+      "description": "Delete bad words (true/false).",
+      "required": false,
+      "value": "true"
+    },
+    "MENTION_REPLY": {
+      "description": "Reply when bot is mentioned (true/false).",
+      "required": false,
+      "value": "false"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "buildpacks": [
+    { "url": "heroku/nodejs" }
+  ]
+}

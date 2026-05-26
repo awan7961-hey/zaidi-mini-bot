@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZAIDI-MD — WhatsApp Pairing</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0a0a0a 0%, #111827 50%, #0f172a 100%);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color: #f1f5f9;
+      padding: 20px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+      backdrop-filter: blur(20px);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .logo-text {
+      font-size: 26px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #25D366, #7dd3fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 14px;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(37,211,102,0.12);
+      border: 1px solid rgba(37,211,102,0.25);
+      color: #25D366;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* Tab Bar */
+    .tab-bar {
+      display: flex;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 4px;
+      margin-bottom: 28px;
+      gap: 4px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      letter-spacing: 0.2px;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(37,211,102,0.35);
+    }
+
+    .tab-btn:not(.active):hover { color: #94a3b8; background: rgba(255,255,255,0.05); }
+
+    /* Tab Panels */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .input-group .flag {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px;
+      pointer-events: none;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 16px 16px 16px 52px;
+      font-size: 16px;
+      color: #f1f5f9;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+
+    input[type="text"]::placeholder { color: #475569; }
+
+    input[type="text"]:focus {
+      border-color: rgba(37,211,102,0.5);
+      background: rgba(255,255,255,0.08);
+      box-shadow: 0 0 0 3px rgba(37,211,102,0.1);
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #475569;
+      margin-top: -8px;
+      margin-bottom: 20px;
+      padding-left: 4px;
+    }
+
+    .btn {
+      width: 100%;
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      border: none;
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
+      letter-spacing: 0.3px;
+      box-shadow: 0 4px 20px rgba(37,211,102,0.3);
+    }
+
+    .btn:hover:not(:disabled) {
+      opacity: 0.92;
+      box-shadow: 0 6px 28px rgba(37,211,102,0.45);
+    }
+
+    .btn:active:not(:disabled) { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .loader {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    .loader.show { display: flex; }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255,255,255,0.15);
+      border-top-color: #25D366;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Pairing Code Box */
+    .code-box {
+      display: none;
+      background: linear-gradient(135deg, rgba(37,211,102,0.08), rgba(18,140,126,0.08));
+      border: 1px solid rgba(37,211,102,0.3);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .code-box.show { display: block; }
+
+    .code-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #25D366;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .code-display {
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: 6px;
+      color: #f1f5f9;
+      font-family: 'Courier New', monospace;
+      text-shadow: 0 0 20px rgba(37,211,102,0.4);
+      cursor: pointer;
+      user-select: all;
+      transition: color 0.2s;
+    }
+
+    .code-display:hover { color: #25D366; }
+
+    .copy-hint {
+      font-size: 11px;
+      color: #475569;
+      margin-top: 8px;
+    }
+
+    .code-timer {
+      font-size: 13px;
+      color: #64748b;
+      margin-top: 10px;
+    }
+
+    /* QR Code Box */
+    .qr-box {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .qr-box.show { display: block; }
+
+    .qr-image-wrap {
+      display: inline-block;
+      padding: 14px;
+      background: #fff;
+      border-radius: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    }
+
+    .qr-image-wrap img {
+      width: 210px;
+      height: 210px;
+      display: block;
+    }
+
+    .qr-label {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 10px;
+    }
+
+    .qr-timer {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 10px;
+    }
+
+    .qr-refresh-btn {
+      background: none;
+      border: 1px solid rgba(37,211,102,0.3);
+      border-radius: 10px;
+      padding: 8px 20px;
+      color: #25D366;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .qr-refresh-btn:hover { background: rgba(37,211,102,0.08); }
+
+    /* Connected State */
+    .connected-box {
+      display: none;
+      text-align: center;
+      padding: 24px;
+      background: rgba(37,211,102,0.08);
+      border: 1px solid rgba(37,211,102,0.25);
+      border-radius: 16px;
+      margin-bottom: 20px;
+    }
+
+    .connected-box.show { display: block; }
+    .connected-box .tick { font-size: 40px; margin-bottom: 8px; }
+    .connected-box h3 { color: #25D366; font-size: 18px; margin-bottom: 6px; }
+    .connected-box p { color: #94a3b8; font-size: 13px; }
+
+    /* Alert */
+    .alert {
+      display: none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .alert.show { display: block; }
+    .alert.error   { background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.25);  color: #fca5a5; }
+    .alert.success { background: rgba(37,211,102,0.1); border: 1px solid rgba(37,211,102,0.25); color: #86efac; }
+    .alert.info    { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25); color: #a5b4fc; }
+
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+      margin: 24px 0;
+    }
+
+    .steps {
+      padding: 20px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .steps-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    .step:last-child { margin-bottom: 0; }
+
+    .step-num {
+      min-width: 22px;
+      height: 22px;
+      background: rgba(37,211,102,0.15);
+      border: 1px solid rgba(37,211,102,0.25);
+      color: #25D366;
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+
+    .footer {
+      text-align: center;
+      color: #334155;
+      font-size: 12px;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+
+    <!-- Header -->
+    <div class="logo">
+      <div class="logo-icon">💬</div>
+      <span class="logo-text">ZAIDI-MD</span>
+    </div>
+    <div style="text-align:center; margin-bottom:4px;">
+      <span class="badge">Link to Device</span>
+    </div>
+    <p class="subtitle">Connect your WhatsApp to the bot — choose pairing code or QR scan.</p>
+
+    <!-- Alert -->
+    <div class="alert" id="alert"></div>
+
+    <!-- Connected Box (global) -->
+    <div class="connected-box" id="globalConnectedBox">
+      <div class="tick">✅</div>
+      <h3>Bot Connected!</h3>
+      <p>Your WhatsApp is now linked. The bot is running.</p>
+    </div>
+
+    <!-- Tab Bar -->
+    <div class="tab-bar" id="mainTabs">
+      <button class="tab-btn active" id="tabCodeBtn" onclick="switchTab('code')">
+        📟 Pair with Code
+      </button>
+      <button class="tab-btn" id="tabQrBtn" onclick="switchTab('qr')">
+        📷 Pair with QR
+      </button>
+    </div>
+
+    <!-- ══ TAB: PAIR WITH CODE ══ -->
+    <div class="tab-panel active" id="panelCode">
+
+      <div id="codeFormSection">
+        <div class="section-title">Your WhatsApp Number</div>
+        <div class="input-group">
+          <span class="flag">📱</span>
+          <input type="text" id="phoneInput" placeholder="923001234567" maxlength="15" inputmode="numeric" />
+        </div>
+        <p class="hint">Include country code, no + or spaces. Example: 923001234567</p>
+        <button class="btn" id="pairBtn" onclick="requestPairCode()">Generate Pairing Code</button>
+      </div>
+
+      <div class="loader" id="codeLoader">
+        <div class="spinner"></div>
+        <span>Requesting pairing code from WhatsApp...</span>
+      </div>
+
+      <div class="code-box" id="codeBox">
+        <div class="code-label">✦ Your Pairing Code ✦</div>
+        <div class="code-display" id="codeDisplay" onclick="copyCode()" title="Click to copy"></div>
+        <div class="copy-hint">Tap the code to copy it</div>
+        <div class="code-timer" id="codeTimer"></div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="steps">
+        <div class="steps-title">How to link with code</div>
+        <div class="step"><div class="step-num">1</div><span>Enter your WhatsApp number and tap <strong>Generate Pairing Code</strong>.</span></div>
+        <div class="step"><div class="step-num">2</div><span>Open WhatsApp → <strong>Settings</strong> → <strong>Linked Devices</strong>.</span></div>
+        <div class="step"><div class="step-num">3</div><span>Tap <strong>Link a Device</strong> → <strong>"Link with phone number instead"</strong>.</span></div>
+        <div class="step"><div class="step-num">4</div><span>Enter the 8-character code shown above.</span></div>
+        <div class="step"><div class="step-num">5</div><span>Done! Bot auto-connects and starts running.</span></div>
+      </div>
+    </div>
+
+    <!-- ══ TAB: PAIR WITH QR ══ -->
+    <div class="tab-panel" id="panelQr">
+
+      <div id="qrStartSection">
+        <p style="color:#94a3b8; font-size:14px; margin-bottom:20px; text-align:center; line-height:1.6;">
+          Tap below to generate a QR code, then scan it from WhatsApp to link the bot instantly.
+        </p>
+        <button class="btn" id="qrStartBtn" onclick="startQRPairing()">Generate QR Code</button>
+      </div>
+
+      <div class="loader" id="qrLoader">
+        <div class="spinner"></div>
+        <span>Generating QR code...</span>
+      </div>
+
+      <div class="qr-box" id="qrBox">
+        <div class="qr-label">Scan this QR code in WhatsApp</div>
+        <div class="qr-image-wrap">
+          <img id="qrImage" src="" alt="QR Code" />
+        </div>
+        <div class="qr-timer" id="qrTimerText">QR expires in <strong id="qrCountdown">60</strong>s — scan quickly!</div>
+        <button class="qr-refresh-btn" onclick="refreshQR()">↻ Refresh QR</button>
+      </div>
+
+      <div class="divider"></div>
+      <div class="steps">
+        <div class="steps-title">How to link with QR</div>
+        <div class="step"><div class="step-num">1</div><span>Tap <strong>Generate QR Code</strong> above.</span></div>
+        <div class="step"><div class="step-num">2</div><span>Open WhatsApp → <strong>Settings</strong> → <strong>Linked Devices</strong>.</span></div>
+        <div class="step"><div class="step-num">3</div><span>Tap <strong>Link a Device</strong> and point camera at the QR code.</span></div>
+        <div class="step"><div class="step-num">4</div><span>Done! Bot auto-connects and starts running.</span></div>
+      </div>
+    </div>
+
+    <div class="footer">ZAIDI-MD Bot &nbsp;•&nbsp; Powered by Baileys</div>
+  </div>
+
+  <script>
+    let codeCountdown    = null;
+    let qrCountdownInt   = null;
+    let statusPolling    = null;
+    let qrPolling        = null;
+
+    /* ─── On load: check if already connected ─── */
+    (async () => {
+      try {
+        const data = await (await fetch('/status')).json();
+        if (data.connected) showGlobalConnected();
+      } catch (e) {}
+    })();
+
+    /* ─── Tab switching ─── */
+    function switchTab(tab) {
+      document.getElementById('tabCodeBtn').className = 'tab-btn' + (tab === 'code' ? ' active' : '');
+      document.getElementById('tabQrBtn').className   = 'tab-btn' + (tab === 'qr'   ? ' active' : '');
+      document.getElementById('panelCode').className  = 'tab-panel' + (tab === 'code' ? ' active' : '');
+      document.getElementById('panelQr').className    = 'tab-panel' + (tab === 'qr'   ? ' active' : '');
+      hideAlert();
+    }
+
+    /* ─── Alert helpers ─── */
+    function showAlert(msg, type) {
+      const el = document.getElementById('alert');
+      el.textContent  = msg;
+      el.className    = 'alert show ' + type;
+    }
+    function hideAlert() { document.getElementById('alert').className = 'alert'; }
+
+    /* ─── Global connected state ─── */
+    function showGlobalConnected() {
+      clearAll();
+      document.getElementById('globalConnectedBox').className = 'connected-box show';
+      document.getElementById('mainTabs').style.display       = 'none';
+      document.getElementById('panelCode').style.display      = 'none';
+      document.getElementById('panelQr').style.display        = 'none';
+      showAlert('WhatsApp connected! Bot is running.', 'success');
+    }
+
+    function clearAll() {
+      if (codeCountdown)  clearInterval(codeCountdown);
+      if (qrCountdownInt) clearInterval(qrCountdownInt);
+      if (statusPolling)  clearInterval(statusPolling);
+      if (qrPolling)      clearInterval(qrPolling);
+    }
+
+    /* ─── Status polling (shared) ─── */
+    function startStatusPolling() {
+      if (statusPolling) clearInterval(statusPolling);
+      statusPolling = setInterval(async () => {
+        try {
+          const data = await (await fetch('/status')).json();
+          if (data.connected) { clearInterval(statusPolling); showGlobalConnected(); }
+        } catch (e) {}
+      }, 3000);
+    }
+
+    /* ════ PAIR WITH CODE ════ */
+    document.getElementById('phoneInput').addEventListener('input', function () {
+      this.value = this.value.replace(/[^0-9]/g, '');
+    });
+
+    async function requestPairCode() {
+      const number = document.getElementById('phoneInput').value.trim();
+      if (!number || number.length < 7) {
+        showAlert('Please enter a valid phone number with country code.', 'error');
+        return;
+      }
+      hideAlert();
+      document.getElementById('codeLoader').className = 'loader show';
+      document.getElementById('pairBtn').disabled     = true;
+      document.getElementById('codeBox').className    = 'code-box';
+
+      try {
+        const data = await (await fetch('/getpaircode?number=' + encodeURIComponent(number))).json();
+        if (data.error) {
+          showAlert(data.error, 'error');
+        } else if (data.code) {
+          showAlert('Code generated! Enter it in WhatsApp → Linked Devices → Link with phone number.', 'success');
+          document.getElementById('codeDisplay').textContent = data.code;
+          document.getElementById('codeBox').className = 'code-box show';
+          startCodeCountdown(120);
+          startStatusPolling();
+        }
+      } catch (err) {
+        showAlert('Connection error. Please check your server and try again.', 'error');
+      }
+
+      document.getElementById('codeLoader').className = 'loader';
+      document.getElementById('pairBtn').disabled     = false;
+    }
+
+    function copyCode() {
+      const code = document.getElementById('codeDisplay').textContent;
+      if (!code) return;
+      navigator.clipboard.writeText(code.replace(/-/g, '')).then(() => {
+        showAlert('Code copied to clipboard!', 'info');
+        setTimeout(hideAlert, 2000);
+      }).catch(() => {
+        const el = document.getElementById('codeDisplay');
+        const r  = document.createRange();
+        r.selectNode(el);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(r);
+      });
+    }
+
+    function startCodeCountdown(seconds) {
+      if (codeCountdown) clearInterval(codeCountdown);
+      const el = document.getElementById('codeTimer');
+      let rem  = seconds;
+      codeCountdown = setInterval(() => {
+        rem--;
+        if (rem <= 0) {
+          clearInterval(codeCountdown);
+          el.textContent  = 'Code expired. Generate a new one.';
+          el.style.color  = '#ef4444';
+        } else {
+          const m = Math.floor(rem / 60), s = rem % 60;
+          el.textContent = 'Code expires in ' + m + ':' + String(s).padStart(2, '0');
+          el.style.color = rem < 30 ? '#f59e0b' : '#64748b';
+        }
+      }, 1000);
+    }
+
+    /* ════ PAIR WITH QR ════ */
+    async function startQRPairing() {
+      hideAlert();
+      document.getElementById('qrStartBtn').disabled = true;
+      document.getElementById('qrLoader').className  = 'loader show';
+      document.getElementById('qrBox').className     = 'qr-box';
+
+      try {
+        const data = await (await fetch('/startqr')).json();
+        if (data.error) {
+          showAlert(data.error, 'error');
+          document.getElementById('qrStartBtn').disabled = false;
+        } else {
+          pollForQR();
+          startStatusPolling();
+        }
+      } catch (err) {
+        showAlert('Failed to start QR session. Try again.', 'error');
+        document.getElementById('qrStartBtn').disabled = false;
+      }
+      document.getElementById('qrLoader').className = 'loader';
+    }
+
+    function pollForQR() {
+      if (qrPolling) clearInterval(qrPolling);
+      let attempts = 0;
+      qrPolling = setInterval(async () => {
+        if (++attempts > 30) { clearInterval(qrPolling); showAlert('QR timeout. Refresh and try again.', 'error'); return; }
+        try {
+          const data = await (await fetch('/getqr')).json();
+          if (data.qr) {
+            clearInterval(qrPolling);
+            document.getElementById('qrImage').src       = data.qr;
+            document.getElementById('qrBox').className   = 'qr-box show';
+            document.getElementById('qrLoader').className = 'loader';
+            startQRCountdown(60);
+          }
+        } catch (e) {}
+      }, 1500);
+    }
+
+    function startQRCountdown(seconds) {
+      if (qrCountdownInt) clearInterval(qrCountdownInt);
+      let rem = seconds;
+      const numEl  = document.getElementById('qrCountdown');
+      const wrapEl = document.getElementById('qrTimerText');
+      qrCountdownInt = setInterval(() => {
+        rem--;
+        if (rem <= 0) {
+          clearInterval(qrCountdownInt);
+          wrapEl.innerHTML = '<span style="color:#ef4444">QR expired. Click Refresh QR to get a new one.</span>';
+        } else {
+          numEl.textContent = rem;
+          wrapEl.style.color = rem < 15 ? '#f59e0b' : '#64748b';
+        }
+      }, 1000);
+    }
+
+    async function refreshQR() {
+      hideAlert();
+      document.getElementById('qrBox').className    = 'qr-box';
+      document.getElementById('qrLoader').className = 'loader show';
+      if (qrPolling)      clearInterval(qrPolling);
+      if (qrCountdownInt) clearInterval(qrCountdownInt);
+
+      try {
+        const data = await (await fetch('/refreshqr')).json();
+        if (data.error) { showAlert(data.error, 'error'); }
+        else { pollForQR(); }
+      } catch (e) { showAlert('Failed to refresh QR. Try again.', 'error'); }
+      document.getElementById('qrLoader').className = 'loader';
+    }
+  </script>
+</body>
+</html>
