@@ -5,7 +5,6 @@ const { getConfig, setConfig } = require('./lib/configdb');
 
 // Default values from environment variables
 const ENV_DEFAULTS = {
-    SESSION_ID:           process.env.SESSION_ID           || "",
     AUTO_STATUS_SEEN:     process.env.AUTO_STATUS_SEEN     || "false",
     AUTO_STATUS_REPLY:    process.env.AUTO_STATUS_REPLY    || "false",
     AUTO_STATUS_REACT:    process.env.AUTO_STATUS_REACT    || "false",
